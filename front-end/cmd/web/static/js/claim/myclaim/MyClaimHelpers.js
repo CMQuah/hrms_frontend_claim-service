@@ -122,27 +122,12 @@ class MyClaimHelpers {
 
     // show | hide category, name and upload doc from form
     // add | remove category, name from required list
-    switchFormFieldsView(id) {
-        if (id == 0) {
-            Common.showDivByID('categoryDiv')
-            Common.showDivByID('nameDiv')
-            myRIF.push('category', 'name')
-        } else {
-            Common.hideDivByID('categoryDiv')
-            Common.hideDivByID('nameDiv')
-            this.removeElementFromRIF('category')
-            this.removeElementFromRIF('name')
-        }
+    switchFormFieldsView() {
         //Upload documentation required or not
         if (document.getElementById('docRequired').value == 1) {
             Common.showDivByID('uploadDocDiv')
-            //TODO check this
-            // myRIF.push('category', 'name')
         } else {
             Common.hideDivByID('uploadDocDiv')
-            //TODO check this
-            // this.removeElementFromRIF('category')
-            // this.removeElementFromRIF('name')
         }
     }
     // populate hidden field (form: confirmation | seniority | docRequired | limitation)
@@ -168,8 +153,6 @@ class MyClaimHelpers {
             let opt = document.createElement('tr')
             opt.id = 'myClaim' + element.rowid
             opt.innerHTML = `<td class="row-data" data-id="${element.claimDefinitionID}">${element.claimDefinition}</td>
-                             <td class="row-data" data-id="${element.categoryID}">${element.category}</td>
-                             <td class="row-data">${element.name}</td>
                              <td class="row-data">${element.description}</td>
                              <td class="row-data">${element.amount}</td>
                              <td class="row-data" data-id="${element.statusID}">${element.status}</td>
@@ -229,7 +212,7 @@ class MyClaimHelpers {
                 break //beware of gotcha where it only breaks inner loop.... Lookout if in the future it's a nested for loop 
             }
         }
-        let errAmount = myDataObj.amount>= limitationToCheck ? 1:0
+        let errAmount = myDataObj.amount> limitationToCheck ? 1:0
         return {'errAmount':errAmount, errDocRequired:0} //need help with doc uploaded
 
     }

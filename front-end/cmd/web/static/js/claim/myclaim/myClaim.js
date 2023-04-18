@@ -51,7 +51,7 @@ window.addEventListener('DOMContentLoaded', () => {
             // if 'not defined' is selected 
             // display category & name (or hide)
             // make category & name required (or not)
-            Helpers.switchFormFieldsView(claimDefinitionID)
+            Helpers.switchFormFieldsView()
         })
     })
 

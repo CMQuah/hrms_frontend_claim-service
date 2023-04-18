@@ -22,10 +22,26 @@ class ClaimDefinitionHelpers {
                     keyboard: false
                 })
                 myModalForm.show()
+                Helpers.removeRowFromDivsByClass('detailRemovable')
                 Helpers.populateFormEdit(rowData, rowID)
-            })
-        })
+                const toggleCheckboxes = document.querySelectorAll(".toggle-checkbox");
+
+                toggleCheckboxes.forEach(function (checkbox) {
+                    checkbox.addEventListener("change", function () {
+                        const row = checkbox.closest(".row");
+                        const inputBoxes = row.querySelectorAll(".input-row");
+                        if (checkbox.checked) {
+                            row.classList.add("disabled");
+                        } else {
+                            row.classList.remove("disabled");
+                        }
+                    });
+                });
+            });
+        });
     }
+
+
 
     // insert one new row details
     insertExistingDetailsRow(data) {
@@ -35,27 +51,29 @@ class ClaimDefinitionHelpers {
         for (let elem = 0; elem < amountOfExistingDetails; elem++) {
             let row = document.createElement('div')
             row.id = 'existingDetail'
-            row.classList = 'row mb-3 newRowDetails'
+            row.classList = 'row mb-3 detailRemovable'
             let existingSeniorityID = data[3].childNodes[elem].id
             let existingLimitationID = data[4].childNodes[elem].id
             //extract id only
             let idOnly = this.extractIDfromRowID(existingLimitationID)
-
-            row.innerHTML = `<div class="col-sm-4">
+            let seniorityExist = data[3].childNodes[elem].innerText.replace('From year ', '')
+            row.innerHTML = `<div class='existingDetailsRow row' id="${idOnly}">
+                                        <div class="col-sm-4 existingDetails">
                                             <div class="form-floating">
-                                            <input type="text" class="form-control existingSeniority" id="${existingSeniorityID}" name="${existingSeniorityID}" value="${data[3].childNodes[elem].innerText}"/>
+                                            <input type="text" class="form-control existingSeniority" id="${existingSeniorityID}" name="${existingSeniorityID}" value="${seniorityExist}"/>
                                             <label for="seniority"><i class="bi-shield-fill-exclamation"></i> seniority</label>
                                             </div>
                                             <div class="fw-bolder text-danger fst-italic smaller existingSeniorityError" id="${existingSeniorityID}Error"></div>
                                         </div>
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-4 existingDetails">
                                             <div class="form-floating">
                                             <input type="text" class="form-control existingLimitation" id="${existingLimitationID}" name="${existingLimitationID}" value="${data[4].childNodes[elem].innerText}" />
                                             <label for="limitation"><i class="bi-shield-fill-exclamation"></i> limitation</label>
                                             </div>
                                             <div class="fw-bolder text-danger fst-italic smaller existingLimitationError" id="${existingLimitationID}Error"></div>
                                         </div> 
-                                        <div class="col-sm-4"><input type="checkbox" class="toggle-checkbox" /><label>Mark For Delete</label></div>`
+                                        <div class="col-sm-4 existingDetails"><input type="checkbox" class="toggle-checkbox" /><label>Mark For Delete</label></div>
+                            </div>`
             target.appendChild(row)
 
 
@@ -63,6 +81,35 @@ class ClaimDefinitionHelpers {
             myRIF.push(existingSeniorityID)
             myRIF.push(existingLimitationID)
         }
+    }
+
+        // insert one new row details
+    insertDefaultDetailsRow() {
+        // create new row
+        const target = document.querySelector('#defaultDetailRow')
+        let row = document.createElement('div')
+        row.classList = 'row mb-3 detailRemovable'
+        row.innerHTML =`<!-- Claim definition details Seniority -->
+                            <div class="col-sm-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="seniority0" name="seniority0" value="0" />
+                                <label for="seniority"><i class="bi-shield-fill-exclamation"></i> Seniority</label>
+                            </div>
+                            <div class="fw-bolder text-danger fst-italic smaller" id="seniority0Error"></div>
+                            </div>
+                            <!-- Claim definition details Limitation -->
+                            <div class="col-sm-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="limitation0" name="limitation0" />
+                                <label for="limitation"><i class="bi-shield-fill-exclamation"></i> Limitation(RM)</label>
+                            </div>
+                            <div class="fw-bolder text-danger fst-italic smaller" id="limitation0Error"></div>
+                            </div>
+                            <div class="col-sm-4"></div>
+                        `
+        target.appendChild(row)
+        myRIF.push('limitation0')
+        myRIF.push('seniority0')
     }
 
 
@@ -74,23 +121,24 @@ class ClaimDefinitionHelpers {
         // create new row
         const target = document.querySelector('#extraDetailRows')
         let row = document.createElement('div')
+        
         row.id = 'newDetails' + n
         row.classList = 'row mb-3 newRowDetails'
-        row.innerHTML = `<div class="col-sm-4 row"">
+        row.innerHTML = `<div class="col-sm-4 row detailRemovable">
                                 <div class="form-floating">
                                 <input type="text" class="form-control input-row newSeniority" id="seniority${n}" name="seniority${n}" />
                                 <label for="seniority"><i class="bi-shield-fill-exclamation"></i> seniority</label>
                                 </div>
                                 <div class="fw-bolder text-danger fst-italic smaller newSeniorityError" id="seniority${n}Error"></div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-4 detailRemovable">
                                 <div class="form-floating">
                                 <input type="text" class="form-control input-row newLimitation" id="limitation${n}" name="limitation${n}" />
                                 <label for="limitation"><i class="bi-shield-fill-exclamation"></i> limitation</label>
                                 </div>
                                 <div class="fw-bolder text-danger fst-italic smaller newLimitationError" id="limitation${n}Error"></div>
                             </div> 
-                            <div class="col-sm-4"><i class="bi-trash2-fill largeIcon pointer deleteDetailRowsButton" data-id="${n}" id="deleteDetailsRow${n}"></i></div>`
+                            <div class="col-sm-4 detailRemovable"><i class="bi-trash2-fill largeIcon pointer deleteDetailRowsButton" data-id="${n}" id="deleteDetailsRow${n}"></i></div>`
         target.appendChild(row)
 
         // set new elements as required
@@ -292,6 +340,47 @@ class ClaimDefinitionHelpers {
     extractIDfromRowID(rowId) {
         let result = rowId.match(/\D+(\d+)$/);
         return result ? result[1] : null;
+    }
+
+    //remove rows from div by class
+    removeRowFromDivsByClass(className) {
+        let divs = document.querySelectorAll('.' + className)
+        divs.forEach(element => {
+            element.remove()
+        })
+    }
+
+    // extract detail from form 
+    extractDetailsFromForm(myData) {
+        let dataObj = JSON.parse(myData)
+        let details = []
+        let detailObj = {seniority: '', limitation: ''}
+    
+        //get all dataObj keys with seniority(n) and limitation(n)
+        for (const [key, value] of Object.entries(dataObj)) {
+            if (key.includes('seniority')) {
+                detailObj.seniority = value
+            }
+            if (key.includes('limitation')) {
+                detailObj.limitation = value
+            }
+            // push only when both are not empty}
+            if (detailObj.seniority != '' && detailObj.limitation != ''){ 
+                details.push(detailObj)
+                detailObj = {seniority: '', limitation: ''}
+            }
+
+        }
+        dataObj.details = details
+        return JSON.stringify(dataObj)
+    }
+
+    // add update details and delete row id array to form
+    addUpdateDetailsAndDeleterowIDToForm(myData, updateDetails, deleteRowID) {
+        let dataObj = JSON.parse(myData)
+        dataObj.detailsUpdate= updateDetails
+        dataObj.detailsDeleted = deleteRowID
+        return JSON.stringify(dataObj)
     }
 
 }

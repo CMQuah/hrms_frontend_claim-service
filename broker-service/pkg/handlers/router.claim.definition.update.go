@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -12,6 +13,7 @@ func UpdateClaimDefinition(w http.ResponseWriter, r *http.Request) {
 	url := claimService + "api/v1/claim/definition/update"
 	resp, err := http.Post(url, "application/json", r.Body)
 	if err != nil {
+		log.Println("error in UpdateClaimDefinition route", err)
 		errorJSON(w, err)
 		return
 	}

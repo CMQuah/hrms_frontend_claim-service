@@ -3,9 +3,9 @@ const Common = new MainHelpers(),
     API = new ClaimDefinitionAPI()
 
 // set form's parameters (Required Input Fields...)
-const myRIF = ['name', 'description', 'category', 'limitation0', 'seniority0']
+const myRIF = ['name', 'description', 'category']
 
-let rowDetailsNumber = 0
+let rowDetailsNumber = 1
 
 // when DOM is loaded
 window.addEventListener('DOMContentLoaded', () => {
@@ -24,23 +24,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // when open form (add button) is clicked (clear warning message & field's values)
     document.querySelector('#openCreateClaimDefinition').addEventListener('click', () => {
+        Helpers.removeRowFromDivsByClass('detailRemovable')
+        Helpers.insertDefaultDetailsRow()
         Common.clearForm('createClaimDefinitionForm', myRIF)
         Common.insertInputValue('create', 'formAction')
-    })
-
-    // when confirmation required is clicked
-    document.querySelector('#confirmation1').addEventListener('click', (e) => {
-        Common.showDivByID('seniorityDiv')
-        Common.showDivByID('seniorityError')
-        myRIF.push('seniority')
-    })
-
-    // when confirmation is not required is clicked
-    document.querySelector('#confirmation2').addEventListener('click', (e) => {
-        Common.hideDivByID('seniorityDiv')
-        Common.hideDivByID('seniorityError')
-        Common.insertInputValue('0', 'seniority')
-        Helpers.removeElementFromRIF('seniority')
     })
 
     // when form is submitted (save button)
@@ -51,7 +38,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // create form   
         if (error == '0' && formAction == 'create') {
             myData = Common.getForm('createClaimDefinitionForm', connectedID)
-            console.log(myData);
+            myData = Helpers.extractDetailsFromForm(myData)
             API.createClaimDefinition(myData).then(resp => {
                 if (!resp.error) location.reload()
             })
@@ -59,13 +46,48 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // edit form
         if (error == '0' && formAction == 'edit') {
-            const toggleCheckboxes = document.querySelectorAll(".toggle-checkbox");
+            myData = Common.getForm('createClaimDefinitionForm', connectedID)
+            myData = Helpers.extractDetailsFromForm(myData)
+            console.log(myData)
+            const allRows = document.querySelectorAll(".existingDetailsRow");
+            const deleteArray = [];
+            const updateArray = [];
 
+            allRows.forEach(function (row) {
+                const rowId = row.id;
+                const senValue = row.querySelector(".existingSeniority").value;
+                const limValue = row.querySelector(".existingLimitation").value;
+                const rowData = {
+                    rowid: rowId,
+                    seniority: senValue,
+                    limitation: limValue
+                };
 
+                const checkbox = row.querySelector(".toggle-checkbox");
+                if (checkbox.checked) {
+                    deleteArray.push(rowId); //push row.id instead since backed takes slice of string
+                } else {
+                    updateArray.push(rowData);
+                }
+            });
+            const newRows = document.querySelectorAll(".newRowDetails");
+            newRows.forEach(function (row2) {
+                const rowId = row2.id;
+                const senValue = row2.querySelector(".newSeniority").value;
+                const limValue = row2.querySelector(".newLimitation").value;
+                const rowData = {
+                    rowid: rowId,
+                    seniority: senValue,
+                    limitation: limValue
+                };
+            });
 
-            // API.updateClaimDefinition(myData).then(resp => {
-            //     if (!resp.error) location.reload()
-            // })
+            myData = Helpers.addUpdateDetailsAndDeleterowIDToForm(myData, updateArray, deleteArray);
+            console.log(myData)
+
+            API.updateClaimDefinition(myData).then(resp => {
+                if (!resp.error) location.reload()
+            })
         }
     })
 
@@ -120,56 +142,4 @@ window.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#addDetails').addEventListener('click', () => {
         Helpers.insertDetailsRow()
     })
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const row = checkbox.closest(".col-sm-4");
-        const inputBoxes = row.querySelectorAll(".form-control");
-        const existingSeniorityInput = row.querySelector(".existingSeniority");
-        const existingLimitationInput = row.querySelector(".existingLimitation");
-        const sendToApiButton = document.getElementById("createClaimDefinitionSubmit");
-
-        toggleCheckboxes.forEach(function (checkbox) {
-            checkbox.addEventListener("change", function () {
-                const row = checkbox.closest(".row");
-                const inputBoxes = row.querySelectorAll(".input-row");
-                if (checkbox.checked) {
-                    row.classList.add("disabled");
-                    existingSeniorityInput.disabled = true;
-                    existingLimitationInput.disabled = true;
-                  } else {
-                    row.classList.remove("disabled");
-                    existingSeniorityInput.disabled = false;
-                    existingLimitationInput.disabled = false;
-                  }
-            });
-        });
-
-        sendToApiButton.addEventListener("click", function () {
-            const allRows = document.querySelectorAll(".row");
-            const checkedArray = [];
-            const uncheckedArray = [];
-
-            allRows.forEach(function (row) {
-                const rowId = row.id;
-                const senValue = row.querySelector(".existingSeniority").value;
-                const limValue = row.querySelector(".existingLimitation").value;
-                const rowData = {
-                    id: rowId,
-                    seninority: senValue,
-                    limitation: limValue
-                };
-
-                const checkbox = row.querySelector(".toggle-checkbox");
-                if (checkbox.checked) {
-                    checkedArray.push(rowData);
-                } else {
-                    uncheckedArray.push(rowData);
-                }
-            });
-
-            console.log("Checked Rows:", checkedArray);
-            console.log("Unchecked Rows:", uncheckedArray);
-        });
-    });
-
 })

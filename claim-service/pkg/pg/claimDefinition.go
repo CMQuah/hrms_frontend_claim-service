@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"log"
 	"strconv"
 	"time"
 )
@@ -37,7 +38,6 @@ func (cd *ClaimDefinition) Insert() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-
 	// insert all claim definition details
 	for _, entry := range cd.Details {
 		_, err = insertClaimDefinitionDetails(entry.Seniority, entry.Limitation, cd.CreatedBy, rowID)
@@ -54,13 +54,15 @@ func (cd *ClaimDefinition) Update() error {
 	// update claim definition
 	err := cd.updateClaimDefinition()
 	if err != nil {
+		log.Println("error at updateCDef", err)
 		return err
 	}
 
 	// update all claim definition details
-	for _, entry := range cd.DetailsUpdate {
+	for _, entry := range cd.Details {
 		_, err = insertClaimDefinitionDetails(entry.Seniority, entry.Limitation, cd.CreatedBy, cd.ID)
 		if err != nil {
+			log.Println("error at insCDef", err)
 			return err
 		}
 	}
@@ -69,6 +71,7 @@ func (cd *ClaimDefinition) Update() error {
 	for _, entry := range cd.DetailsUpdate {
 		err = updateClaimDefinitionDetails(entry.Seniority, entry.Limitation, cd.CreatedBy, entry.ID)
 		if err != nil {
+			log.Println("error at upCDef", err)
 			return err
 		}
 	}
@@ -77,11 +80,13 @@ func (cd *ClaimDefinition) Update() error {
 	if len(cd.DetailsDeleted) > 0 {
 		for _, entry := range cd.DetailsDeleted {
 			rowID, err := strconv.Atoi(entry)
+			log.Println("rowID", rowID)
 			if err != nil {
 				return err
 			}
 			err = deleteClaimDefinitionDetails(rowID)
 			if err != nil {
+				log.Println("error at delCDef", err)
 				return err
 			}
 		}
@@ -210,8 +215,7 @@ func (cd *ClaimDefinition) insertClaimDefinition() (int, error) {
 
 	// SQL statement which insert a new employee
 	stmt := `INSERT INTO public."CLAIM_DEFINITION" (active, "name", description,
-			category_id, confirmation_required, seniority_required,
-			limitation, doc_required, created_by, updated_by) 
+			category_id, limitation, doc_required, created_by, updated_by) 
 			VALUES($1, $2, $3, $4, $5, $6, $7, $8) returning id;`
 
 	// executes SQL query (set SQL parameters and cacth rowID)
@@ -248,10 +252,10 @@ func (cd *ClaimDefinition) updateClaimDefinition() error {
 				"name"=$2, 
 				description=$3, 
 				category_id=$4, 
-				limitation=$6, 
-				doc_required=$7, 
+				limitation=$5, 
+				doc_required=$6, 
 				soft_delete=0
-			 WHERE id=$9;`
+			 WHERE id=$7;`
 
 	// executes SQL query
 	_, err := db.ExecContext(ctx, stmt,
@@ -358,6 +362,8 @@ func insertClaimDefinitionDetails(seniority int, limitation float32, user int, r
 			claim_definition_id, created_by, updated_by)
 			VALUES($1, $2, $3, $4, $5) returning id;`
 
+	log.Println("Output in insertClaimDefinitionDetails: ", seniority, limitation, user, rowID)
+
 	// executes SQL query (set SQL parameters and cacth rowID)
 	var newID int
 
@@ -401,6 +407,8 @@ func updateClaimDefinitionDetails(seniority int, limitation float32, user int, r
 	// canceling this context releases resources associated with it
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
+
+	log.Println("arg", seniority, limitation, user, rowID)
 
 	// SQL statement which update an employee (soft delete)
 	stmt := `UPDATE public."CLAIM_DEFINITION_DETAILS" 
