@@ -1,6 +1,6 @@
 class MyClaimHelpers {
     // populate form to edit entry
-    populateFormEdit(data, active, rowID){
+    populateFormEdit(data, active, rowID) {
         Common.insertHTML('Edit claim', 'createClaimDefinitionTitle')
         Common.insertInputValue('edit', 'formAction')
         Common.insertInputValue(rowID, 'rowid')
@@ -13,16 +13,16 @@ class MyClaimHelpers {
         Common.checkRadio(data[5].innerHTML, 'docRequired')
     }
     // populate and launch edit modal form
-    makeEditable(){
+    makeEditable() {
         document.querySelectorAll('.editClaim').forEach(element => {
             element.addEventListener('click', (e) => {
                 console.log(e.target);
                 const rowID = e.target.dataset.id,
-                      rowData = document.getElementById('CD'+rowID).querySelectorAll('.row-data'),
-                      viewData = document.querySelector('#dataView').value
+                    rowData = document.getElementById('CD' + rowID).querySelectorAll('.row-data'),
+                    viewData = document.querySelector('#dataView').value
                 Helpers.populateFormEdit(rowData, viewData, rowID)
-                const myModalForm = new bootstrap.Modal(document.getElementById('createClaimDefinition'), { 
-                    keyboard: false 
+                const myModalForm = new bootstrap.Modal(document.getElementById('createClaimDefinition'), {
+                    keyboard: false
                 })
                 myModalForm.show()
             })
@@ -63,39 +63,62 @@ class MyClaimHelpers {
         })
     }
 
+    // populate upload files
+    populateUploadFiles(wanted) {
+        switch (wanted) {
+            case 'docs':
+                Common.insertHTML('Documentation', 'uploadedFilesTitle')
+                Common.insertInputValue('Documentation', 'uploadedFilename')
+                break;
+            default:
+                break;
+        }
+    }
+
     // add user information to connectedUser
-    updateUserInformation(data){
-        connectedUser.code          = data.Code
-        connectedUser.fullname     = data.Fullname
-        connectedUser.nickname      = data.Nickname
-        connectedUser.joinDate      = data.JoinDate
-        connectedUser.confirmDate   = data.ConfirmDate
+    updateUserInformation(data) {
+        connectedUser.code = data.Code
+        connectedUser.fullname = data.Fullname
+        connectedUser.nickname = data.Nickname
+        connectedUser.joinDate = data.JoinDate
+        connectedUser.confirmDate = data.ConfirmDate
     }
 
     // remove element from my required input fields array
-    removeElementFromRIF(name){
+    removeElementFromRIF(name) {
         const index = myRIF.indexOf(name);
-            if (index > -1) { // splice array only when item is found
-                myRIF.splice(index, 1); // 2nd parameter means remove one item only
-            }
+        if (index > -1) { // splice array only when item is found
+            myRIF.splice(index, 1); // 2nd parameter means remove one item only
+        }
     }
 
-    // show | hide category, name from form
+    // show | hide category, name and upload doc from form
     // add | remove category, name from required list
-    switchFormFieldsView(id){
-        if (id == 0 ) {
+    switchFormFieldsView(id) {
+        if (id == 0) {
             Common.showDivByID('categoryDiv')
             Common.showDivByID('nameDiv')
             myRIF.push('category', 'name')
-        }else{
+        } else {
             Common.hideDivByID('categoryDiv')
             Common.hideDivByID('nameDiv')
             this.removeElementFromRIF('category')
             this.removeElementFromRIF('name')
         }
+        //Upload documentation required or not
+        if (document.getElementById('docRequired').value == 1) {
+            Common.showDivByID('uploadDocDiv')
+            //TODO check this
+            // myRIF.push('category', 'name')
+        } else {
+            Common.hideDivByID('uploadDocDiv')
+            //TODO check this
+            // this.removeElementFromRIF('category')
+            // this.removeElementFromRIF('name')
+        }
     }
     // populate hidden field (form: confirmation | seniority | docRequired | limitation)
-    populateHiddenFields(data){
+    populateHiddenFields(data) {
         Common.insertInputValue(data.confirmation, 'confirmation')
         Common.insertInputValue(data.seniority, 'seniority')
         Common.insertInputValue(data.docRequired, 'docRequired')
@@ -103,10 +126,10 @@ class MyClaimHelpers {
     }
 
     // convert birthdate (remove timestamp)
-    formatDate(t){
+    formatDate(t) {
         let b
         // get only the 10 first characters of the string
-        const d = t.substring(0,10)
+        const d = t.substring(0, 10)
         // the zero value of a date is 0001-01-01
         return (d == '0001-01-01') ? b = '' : b = d
     }
@@ -114,7 +137,7 @@ class MyClaimHelpers {
     insertRows(data) {
         const target = document.querySelector('#myClaimBody')
         target.innerHTML = ''
-        data.forEach(element => { 
+        data.forEach(element => {
             let opt = document.createElement('tr')
             opt.id = 'myClaim' + element.rowid
             opt.innerHTML = `<td class="row-data" data-id="${element.claimDefinitionID}">${element.claimDefinition}</td>
@@ -141,25 +164,25 @@ class MyClaimHelpers {
             target.appendChild(opt)
         })
         $('#myClaimTable').DataTable()
-    } 
+    }
 
     // returns list of selected claim id to be deleted
-    selectedClaim(){
+    selectedClaim() {
         const checked = document.querySelectorAll('input[name=softDelete]:checked')
         if (checked.length == 0) document.querySelector('#deleteWarningMessageDiv').style.display = 'block'
-        if (checked.length > 0){
+        if (checked.length > 0) {
             let allChecked = []
             checked.forEach(element => {
                 allChecked.push(element.value)
             })
-            console.log('allChecked: '+allChecked);
+            console.log('allChecked: ' + allChecked);
             return allChecked
-        }        
+        }
     }
     // populate confirm detele message
-    populateConfirmDelete(nb){
+    populateConfirmDelete(nb) {
         let msg
-        (nb == 1)? msg = 'Do you really want to delete this claim?' : msg = `Do you really want to delete ${nb} claims?`
+        (nb == 1) ? msg = 'Do you really want to delete this claim?' : msg = `Do you really want to delete ${nb} claims?`
 
         const myBody = document.querySelector('#confirmDeleteBody')
         myBody.innerHTML = msg

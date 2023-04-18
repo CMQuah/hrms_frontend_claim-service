@@ -138,7 +138,28 @@
             </div>
             <div class="col-sm-4"></div>
           </div>
-          <!-- 3rd row (description) -->
+          <!-- 3rd row upload documentation -->
+          <div class="col-sm-4 hide" id="uploadDocDiv">                
+            <div class="form-floating">
+              <input type="text" class="form-control" id="documentation" name="documentation" />
+              <label for="documentation">Upload documentation</label>
+            </div>
+            <!-- identity:  documentation files buttons (upload, uploaded, archived) -->
+            <div class="row mt-1">
+              <div class="col"><i class="bi-upload largeIcon pointer" id="uploadDocumentationButton" data-bs-toggle="tooltip" data-bs-placement="top" title="Upload files"></i></div>
+              <!-- TODO: Might not need this section to check with Ben -->
+              <!-- <div class="col text-end">
+                <div class="d-flex justify-content-end">
+                  <span data-bs-toggle="modal" data-bs-target="#uploadedIC"><i class="bi-folder-check largeIcon pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Latest files"></i></span>
+                  <span>&nbsp;</span>
+                  <span data-bs-toggle="modal" data-bs-target="#archivedIC"><i class="bi-folder-x largeIcon pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Archive files"></i></span>
+                </div>                    
+              </div> -->
+            </div>
+            <div class="fw-bolder text-danger fst-italic smaller" id="documentationError"></div>
+          </div>
+
+          <!-- 4th row (description) -->
           <div class="row mb-3">
             <!-- Claim description -->
             <div class="col-sm-12">
@@ -158,6 +179,36 @@
     </div>
   </div>
 </div>
+<!--FORM UPLOAD FILES -->
+<!-- TODO add upload api http://localhost:8484/api/v1/claim/upload/ -->
+<form action=# id="uploadedFilesForm" name="uploadedFilesForm"  method="POST" enctype="multipart/form-data">
+  <div class="modal fade" id="uploadedFilesModal" aria-labelledby="uploadedFilesLabel" aria-hidden="true"> 
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Upload <span id="uploadedFilesTitle"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="uploadedFilename" name="uploadedFilename" value="" />
+          <input type="hidden" id="employeeEmail" name="employeeEmail" value="" />
+          <input type="hidden" id="employeeID" name="employeeID" value="" />
+          <div class="mb-3">
+            <label for="formFileMultiple" class="form-label">Select Files</label>
+            <input class="form-control" type="file" id="uploadedFiles" name="uploadedFiles" multiple required />
+            <div class="fw-bolder text-warning fst-italic smaller">We accept only "JPG", "GIF", "PNG", "BMP", "PDF"</div>
+            <div class="fw-bolder text-danger fst-italic smaller" id="uploadedFilesError"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-danger" value="Upload" />
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
 
 {{end}}
 

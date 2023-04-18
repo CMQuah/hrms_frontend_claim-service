@@ -9,6 +9,7 @@ const myRIF = [ 'name', 'description', 'category']
 let allEmployees = new Map()
 allEmployees.set(0, 'not defined')
 
+
 // when DOM is loaded
 window.addEventListener('DOMContentLoaded', () => {
     const noAction = false

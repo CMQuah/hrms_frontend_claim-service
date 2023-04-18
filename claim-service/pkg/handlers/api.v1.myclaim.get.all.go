@@ -20,6 +20,7 @@ func (rep *Repository) GetAllMyClaim(w http.ResponseWriter, r *http.Request) {
 
 	// get all my claims
 	all, err := rep.App.Models.Claim.GetAllMyClaim(p.ID)
+	log.Println("the value ", p.ID, all)
 	if err != nil {
 		rep.errorJSON(w, err)
 		return

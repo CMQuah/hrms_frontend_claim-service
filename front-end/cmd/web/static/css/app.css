@@ -274,3 +274,9 @@
 .arrow:nth-child(2){
   top: 42%;
 }
+
+/* CSS to change the input box to grey when disabled */
+.disabled input[type="text"] {
+  pointer-events: none;
+    opacity: 0.5;
+}

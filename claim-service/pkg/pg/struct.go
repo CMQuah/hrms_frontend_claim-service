@@ -40,11 +40,9 @@ type Claim struct {
 	ID                int     `json:"rowid,string,omitempty"`
 	ClaimDefinitionID int     `json:"claimDefinitionID,string,omitempty"`
 	ClaimDefinition   string  `json:"claimDefinition"`
-	Name              string  `json:"name"`
 	Description       string  `json:"description"`
 	Amount            float32 `json:"amount,string,omitempty"`
 	CategoryID        int     `json:"categoryid,string,omitempty"`
-	Category          string  `json:"category"`
 	StatusID          int     `json:"statusid,string,omitempty"`
 	Status            string  `json:"status"`
 	ApprovedAt        string  `json:"approvedAt"`
@@ -79,19 +77,33 @@ type AllClaimDefinition struct {
 
 // Structure holding one Claim Definition
 type ClaimDefinition struct {
-	ID                   int     `json:"rowid,string,omitempty"`
-	Active               int     `json:"active,string"`
-	Name                 string  `json:"name"`
-	Description          string  `json:"description"`
-	Category             string  `json:"category"`
-	CategoryID           int     `json:"categoryid,string,omitempty"`
-	ConfirmationRequired int     `json:"confirmation,string,omitempty"`
-	SeniorityRequired    int     `json:"seniority,string,omitempty"`
-	Limitation           float32 `json:"limitation,string,omitempty"`
-	DocRequired          int     `json:"docRequired,string,omitempty"`
-	SoftDelete           int     `json:"softDelete,string,omitempty"`
-	CreatedAt            string  `json:"createdAt,omitempty"`
-	CreatedBy            int     `json:"createdBy,string,omitempty"`
-	UpdatedAt            string  `json:"updatedAt,omitempty"`
-	UpdatedBy            int     `json:"updatedBy,string,omitempty"`
+	ID             int                       `json:"rowid,string,omitempty"`
+	Active         int                       `json:"active,string"`
+	Name           string                    `json:"name"`
+	Description    string                    `json:"description"`
+	Category       string                    `json:"category"`
+	CategoryID     int                       `json:"categoryid,string,omitempty"`
+	Limitation     float32                   `json:"limitation,string,omitempty"`
+	DocRequired    int                       `json:"docRequired,string,omitempty"`
+	Details        []*ClaimDefinitionDetails `json:"details"`
+	DetailsUpdate  []*ClaimDefinitionDetails `json:"detailsUpdate"`
+	DetailsDeleted []string                  `json:"detailsDeleted"`
+	SoftDelete     int                       `json:"softDelete,string,omitempty"`
+	CreatedAt      string                    `json:"createdAt,omitempty"`
+	CreatedBy      int                       `json:"createdBy,string,omitempty"`
+	UpdatedAt      string                    `json:"updatedAt,omitempty"`
+	UpdatedBy      int                       `json:"updatedBy,string,omitempty"`
+}
+
+// Structure holding one Claim Definition detail
+type ClaimDefinitionDetails struct {
+	ID                int     `json:"rowid,string,omitempty"`
+	Seniority         int     `json:"seniority,string"`            // TODO: discuss with Ben maybe send as integer... Reason no need to parseInt on js ?
+	Limitation        float32 `json:"limitation,string,omitempty"` // TODO: discuss with Ben whether to remove omit empty here.... and maybe send as float ?
+	ClaimDefinitionID int     `json:"claimDefinitionID,string,omitempty"`
+	SoftDelete        int     `json:"softDelete,string,omitempty"`
+	CreatedAt         string  `json:"createdAt,omitempty"`
+	CreatedBy         int     `json:"createdBy,string,omitempty"`
+	UpdatedAt         string  `json:"updatedAt,omitempty"`
+	UpdatedBy         int     `json:"updatedBy,string,omitempty"`
 }

@@ -223,6 +223,10 @@ func (u *User) PasswordMatches(plainText string) (bool, error) {
 		switch {
 		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
 			// invalid password
+			log.Println("uInfo", u)
+			log.Println("planText compared", plainText)
+			log.Println("hash compared", u.Password)
+			log.Println("passwordCheck", err)
 			return false, nil
 		default:
 			return false, err

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -8,7 +9,9 @@ import (
 func (rep *Repository) GetAllClaimDefinition(w http.ResponseWriter, r *http.Request) {
 	// get claim definition (active, inactive, deleted)
 	all, err := rep.App.Models.ClaimDefinition.GetClaimDefinition()
+
 	if err != nil {
+		log.Println("the err in api all claim definition", err)
 		rep.errorJSON(w, err)
 		return
 	}
@@ -20,6 +23,7 @@ func (rep *Repository) GetAllClaimDefinition(w http.ResponseWriter, r *http.Requ
 		Data:    all,
 	}
 
+	log.Println("data", all.Active[0].Name)
 	rep.writeJSON(w, http.StatusAccepted, answer)
 
 }

@@ -1,9 +1,11 @@
-const Common  = new MainHelpers(),
-      Helpers = new ClaimDefinitionHelpers(),
-      API     = new ClaimDefinitionAPI()
+const Common = new MainHelpers(),
+    Helpers = new ClaimDefinitionHelpers(),
+    API = new ClaimDefinitionAPI()
 
 // set form's parameters (Required Input Fields...)
-const myRIF = [ 'name', 'description', 'category','limitation', 'seniority']
+const myRIF = ['name', 'description', 'category', 'limitation0', 'seniority0']
+
+let rowDetailsNumber = 0
 
 // when DOM is loaded
 window.addEventListener('DOMContentLoaded', () => {
@@ -12,7 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
     API.getAllClaimDefinition().then(resp => {
         // display active claim definition
         Helpers.insertRows(resp.data.Active)
-        Helpers.makeEditable()        
+        Helpers.makeEditable()
     })
 
     // fetch claim category & update DOM (form dropdown)
@@ -21,7 +23,7 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 
     // when open form (add button) is clicked (clear warning message & field's values)
-    document.querySelector('#openCreateClaimDefinition').addEventListener('click', () =>{ 
+    document.querySelector('#openCreateClaimDefinition').addEventListener('click', () => {
         Common.clearForm('createClaimDefinitionForm', myRIF)
         Common.insertInputValue('create', 'formAction')
     })
@@ -44,24 +46,26 @@ window.addEventListener('DOMContentLoaded', () => {
     // when form is submitted (save button)
     document.querySelector('#createClaimDefinitionSubmit').addEventListener('click', () => {
         const error = Common.validateRequiredFields(myRIF),
-              formAction = document.querySelector('#formAction').value
+            formAction = document.querySelector('#formAction').value
 
         // create form   
-        if (error == '0' && formAction == 'create'){
+        if (error == '0' && formAction == 'create') {
             myData = Common.getForm('createClaimDefinitionForm', connectedID)
             console.log(myData);
-            API.createClaimDefinition(myData).then(resp => { 
-                if (! resp.error) location.reload()
-            })            
+            API.createClaimDefinition(myData).then(resp => {
+                if (!resp.error) location.reload()
+            })
         }
 
         // edit form
-        if (error == '0' && formAction == 'edit'){
-            myData = Common.getForm('createClaimDefinitionForm', connectedID)
-            
-            API.updateClaimDefinition(myData).then(resp => {
-                if (! resp.error) location.reload()
-            })            
+        if (error == '0' && formAction == 'edit') {
+            const toggleCheckboxes = document.querySelectorAll(".toggle-checkbox");
+
+
+
+            // API.updateClaimDefinition(myData).then(resp => {
+            //     if (!resp.error) location.reload()
+            // })
         }
     })
 
@@ -71,8 +75,8 @@ window.addEventListener('DOMContentLoaded', () => {
     })
 
     // initiate delete confirm modal
-    const myConfirm = new bootstrap.Modal(document.getElementById('confirmDelete'), { 
-        keyboard: false 
+    const myConfirm = new bootstrap.Modal(document.getElementById('confirmDelete'), {
+        keyboard: false
     })
 
     // cleaned checked checkboxes when modal is close
@@ -88,10 +92,10 @@ window.addEventListener('DOMContentLoaded', () => {
     // when delete all is clicked
     const myDeleteAll = document.querySelector('#deleteAllClaimDefinition')
 
-    myDeleteAll.addEventListener('click', () => { 
+    myDeleteAll.addEventListener('click', () => {
         const checked = Helpers.selectedClaimDefinition()
-       
-        if (typeof checked != 'undefined' && checked.length > 0){
+
+        if (typeof checked != 'undefined' && checked.length > 0) {
             Helpers.populateConfirmDelete(checked.length)
             myConfirm.show()
         }
@@ -105,12 +109,67 @@ window.addEventListener('DOMContentLoaded', () => {
         const checked = Helpers.selectedClaimDefinition()
 
         API.softDeleteClaimDefinition(checked, connectedEmail).then(resp => {
-            if (!resp.error){
+            if (!resp.error) {
                 myConfirm.hide()
                 location.reload()
             }
         })
 
     })
-    
+    // when add details row is clicked
+    document.querySelector('#addDetails').addEventListener('click', () => {
+        Helpers.insertDetailsRow()
+    })
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const row = checkbox.closest(".col-sm-4");
+        const inputBoxes = row.querySelectorAll(".form-control");
+        const existingSeniorityInput = row.querySelector(".existingSeniority");
+        const existingLimitationInput = row.querySelector(".existingLimitation");
+        const sendToApiButton = document.getElementById("createClaimDefinitionSubmit");
+
+        toggleCheckboxes.forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                const row = checkbox.closest(".row");
+                const inputBoxes = row.querySelectorAll(".input-row");
+                if (checkbox.checked) {
+                    row.classList.add("disabled");
+                    existingSeniorityInput.disabled = true;
+                    existingLimitationInput.disabled = true;
+                  } else {
+                    row.classList.remove("disabled");
+                    existingSeniorityInput.disabled = false;
+                    existingLimitationInput.disabled = false;
+                  }
+            });
+        });
+
+        sendToApiButton.addEventListener("click", function () {
+            const allRows = document.querySelectorAll(".row");
+            const checkedArray = [];
+            const uncheckedArray = [];
+
+            allRows.forEach(function (row) {
+                const rowId = row.id;
+                const senValue = row.querySelector(".existingSeniority").value;
+                const limValue = row.querySelector(".existingLimitation").value;
+                const rowData = {
+                    id: rowId,
+                    seninority: senValue,
+                    limitation: limValue
+                };
+
+                const checkbox = row.querySelector(".toggle-checkbox");
+                if (checkbox.checked) {
+                    checkedArray.push(rowData);
+                } else {
+                    uncheckedArray.push(rowData);
+                }
+            });
+
+            console.log("Checked Rows:", checkedArray);
+            console.log("Unchecked Rows:", uncheckedArray);
+        });
+    });
+
 })

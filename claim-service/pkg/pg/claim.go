@@ -3,16 +3,13 @@ package pg
 import (
 	"context"
 	"log"
-	"strconv"
 	"time"
 )
 
 // helper for create new claim (set default value)
-func createMyDefaultValue(category string) claimDefaultValue {
-	categoryID, _ := strconv.Atoi(category)
+func createMyDefaultValue() claimDefaultValue {
 
 	return claimDefaultValue{
-		CategoryID:     categoryID,
 		StatusID:       2,
 		ApprovedAt:     "0001-01-01",
 		ApprovedBy:     0,
@@ -30,34 +27,30 @@ func (c *Claim) Insert() (int, error) {
 
 	// SQL statement which update an employee (soft delete)
 	stmt := `INSERT INTO public."CLAIM_APPLICATION" (claim_definition_id, 
-										 "name", 
 										 description, 
 										 amount, 
-										 category_id, 
 										 status_id, 
 										 approved_at, 
 										 approved_by, 
 										 approved_amount, 
-										 approved_reason, 
+										 rejected_reason, 
 										 employee_id, 
 										 soft_delete,
 										 created_by,
 										 updated_by) 
-			 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 0, $12, $13) returning id;`
+			 VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, 0, $10, $11) returning id;`
 
 	// store new row id
 	var newID int
 
 	// get claim default value
-	cdv := createMyDefaultValue(c.Category)
+	cdv := createMyDefaultValue()
 
 	// executes SQL query (set SQL parameters and cacth rowID)
 	err := db.QueryRowContext(ctx, stmt,
 		c.ClaimDefinition,
-		c.Name,
 		c.Description,
 		c.Amount,
-		cdv.CategoryID,
 		cdv.StatusID,
 		cdv.ApprovedAt,
 		cdv.ApprovedBy,
@@ -124,7 +117,7 @@ func (c *Claim) Reject(rowID, userID int, reason string) error {
 	defer cancel()
 
 	// SQL statement which update the claim (approve it)
-	stmt := `UPDATE public."CLAIM_APPLICATION" SET status_id=3, approved_at=$1, approved_by=$2, approved_amount=0 , approved_reason=$3, updated_by=$2, updated_at=$1 WHERE id=$4;`
+	stmt := `UPDATE public."CLAIM_APPLICATION" SET status_id=3, approved_at=$1, approved_by=$2, approved_amount=0 , rejected_reason=$3, updated_by=$2, updated_at=$1 WHERE id=$4;`
 
 	// executes SQL query
 	_, err := db.ExecContext(ctx, stmt, now, userID, reason, rowID)
@@ -165,32 +158,29 @@ func (c *Claim) GetAllMyClaim(eid int) ([]*Claim, error) {
 	query := `SELECT c.id, 
 					 c.claim_definition_id,
 					 cd.name as claim_definition,
-					 c."name", 
 					 c.description, 
 					 c.amount, 
-					 c.category_id, 
-					 ccc.name as category, 
 					 c.status_id, 
 					 ccs.name as status, 
 					 c.approved_at, 
 					 c.approved_by, 
 					 c.approved_amount, 
-					 c.approved_reason,
+					 c.rejected_reason,
 					 c.created_at,
 					 c.created_by,
 					 c.updated_at,
 					 c.updated_by
-			  FROM public."CLAIM_APPLICATION" c, public."CLAIM_DEFINITION" cd, public."CONFIG_CATEGORY" ccc, public."CONFIG_STATUS" ccs
+			  FROM public."CLAIM_APPLICATION" c, public."CLAIM_DEFINITION" cd, public."CONFIG_STATUS" ccs
 			  WHERE c.soft_delete = 0
 			  AND c.employee_id = $1
 			  AND c.claim_definition_id = cd.id
-			  and c.category_id = ccc.id
 			  and c.status_id = ccs.id
 			  ORDER BY c.id;`
 
 	// executes SQL query
 	rows, err := db.QueryContext(ctx, query, eid)
 	if err != nil {
+		log.Println("the error in query", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -203,11 +193,8 @@ func (c *Claim) GetAllMyClaim(eid int) ([]*Claim, error) {
 			&myClaims.ID,
 			&myClaims.ClaimDefinitionID,
 			&myClaims.ClaimDefinition,
-			&myClaims.Name,
 			&myClaims.Description,
 			&myClaims.Amount,
-			&myClaims.CategoryID,
-			&myClaims.Category,
 			&myClaims.StatusID,
 			&myClaims.Status,
 			&myClaims.ApprovedAt,
@@ -220,6 +207,7 @@ func (c *Claim) GetAllMyClaim(eid int) ([]*Claim, error) {
 			&myClaims.UpdatedBy,
 		)
 		if err != nil {
+			log.Println("the error in scan", err)
 			return nil, err
 		}
 
@@ -344,17 +332,15 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 	query := `SELECT c.id, 
 					 c.claim_definition_id,
 					 cd.name as claim_definition,
-					 c."name", 
 					 c.description, 
 					 c.amount, 
-					 c.category_id, 
 					 ccc.name as category, 
 					 c.status_id, 
 					 ccs.name as status, 
 					 c.approved_at, 
 					 c.approved_by, 
 					 c.approved_amount, 
-					 c.approved_reason, 
+					 c.rejected_reason, 
 					 c.employee_id,
 					 c.created_at,
 					 c.created_by,
@@ -363,7 +349,6 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 			  FROM public."CLAIM_APPLICATION" c, public."CLAIM_DEFINITION" cd, public."CONFIG_CATEGORY" ccc, public."CONFIG_STATUS" ccs
 			  WHERE c.status_id = $1
 			  AND c.claim_definition_id = cd.id
-			  and c.category_id = ccc.id
 			  and c.status_id = ccs.id
 			  ORDER BY c.id;`
 
@@ -382,11 +367,8 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 			&myClaims.ID,
 			&myClaims.ClaimDefinitionID,
 			&myClaims.ClaimDefinition,
-			&myClaims.Name,
 			&myClaims.Description,
 			&myClaims.Amount,
-			&myClaims.CategoryID,
-			&myClaims.Category,
 			&myClaims.StatusID,
 			&myClaims.Status,
 			&myClaims.ApprovedAt,
@@ -420,17 +402,15 @@ func getAllMyClaimByStatus(status, eid int) ([]*Claim, error) {
 	query := `SELECT c.id, 
 					 c.claim_definition_id,
 					 cd.name as claim_definition,
-					 c."name", 
 					 c.description, 
 					 c.amount, 
-					 c.category_id, 
 					 ccc.name as category, 
 					 c.status_id, 
 					 ccs.name as status, 
 					 c.approved_at, 
 					 c.approved_by, 
 					 c.approved_amount, 
-					 c.approved_reason, 
+					 c.rejected_reason, 
 					 c.employee_id,
 					 c.created_at,
 					 c.created_by,
@@ -440,7 +420,6 @@ func getAllMyClaimByStatus(status, eid int) ([]*Claim, error) {
 			  WHERE c.status_id = $1
 			  AND c.employee_id  = $2
 			  AND c.claim_definition_id = cd.id
-			  AND c.category_id = ccc.id
 			  AND c.status_id = ccs.id
 			  AND date_part('year', c.created_at) = date_part('year', CURRENT_DATE)
 			  ORDER BY c.id;`
@@ -460,11 +439,8 @@ func getAllMyClaimByStatus(status, eid int) ([]*Claim, error) {
 			&myClaims.ID,
 			&myClaims.ClaimDefinitionID,
 			&myClaims.ClaimDefinition,
-			&myClaims.Name,
 			&myClaims.Description,
 			&myClaims.Amount,
-			&myClaims.CategoryID,
-			&myClaims.Category,
 			&myClaims.StatusID,
 			&myClaims.Status,
 			&myClaims.ApprovedAt,

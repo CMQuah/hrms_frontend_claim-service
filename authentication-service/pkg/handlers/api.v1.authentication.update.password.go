@@ -3,6 +3,7 @@ package handlers
 import (
 	"authentication/pkg/pg"
 	"errors"
+	"log"
 	"net/http"
 )
 
@@ -15,6 +16,8 @@ func (rep *Repository) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		rep.errorJSON(w, err)
 		return
 	}
+
+	log.Println("Current User", payload.CreatedBy)
 
 	// fetch user information from DB
 	user, err := rep.App.Models.User.GetOne(payload.CreatedBy)
