@@ -1,4 +1,33 @@
 class MyClaimHelpers {
+
+    populateWarningMessage(notValid){
+        let msg
+        (notValid.length == 1) ? msg = `Sorry there is an error with this field <ul>` : 
+                                 msg = `Sorry there is still few errors with those fields <ul>`
+
+        notValid.forEach(field => {
+            msg += `<li>${Common.replaceCamelCase(field)}</li>`
+        })
+
+        msg += `</ul>`
+
+        return msg
+    }
+
+    // display main warning message
+    displayWarningMessage(notValid){
+        const myWarningDivID  = 'warningMessageDiv',
+              myWarningBodyID = 'warningMessageBody'
+
+        if (!notValid?.length) {
+            Common.hideDivByID(myWarningDivID)
+        }else{
+            Common.showDivByID(myWarningDivID)
+            Common.insertHTML(this.populateWarningMessage(notValid), myWarningBodyID)
+        }
+      
+    }
+
     // populate form to edit entry
     populateFormEdit(data, active, rowID) {
         Common.insertHTML('Edit claim', 'createClaimDefinitionTitle')

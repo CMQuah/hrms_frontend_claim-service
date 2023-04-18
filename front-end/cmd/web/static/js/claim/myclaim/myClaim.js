@@ -67,16 +67,18 @@ window.addEventListener('DOMContentLoaded', () => {
         let error = Common.validateRequiredFields(myRIF)
         myData = Common.getForm('claimForm', connectedID)
         console.log(myData);
+        let errorsKeys = []
         let errsForm = Helpers.validateApplication(myData)
         // iterate through errsForm's keys and check any with value with 1
         // if any, display warning message
   
         for (const [key, value] of Object.entries(errsForm)) {
-            if (value == '1') {
-                console.log(key)
-                Common.showDivByID('warningMessageDiv')
+            if (key == 'errAmount' && value == '1'){
+                Common.insertHTML('Amount exceeded limitation', 'amountError')
                 error = 1
+                errorsKeys.push('amountError')
             }
+            Helpers.displayWarningMessage(errorsKeys);
         }
 
         if (error == '0') {
