@@ -311,7 +311,8 @@ func GetClaimDefinitionDetails(id int) ([]*ClaimDefinitionDetails, error) {
 			  FROM public."CLAIM_DEFINITION_DETAILS" 
 			  WHERE soft_delete = 0
 			  AND claim_definition_id = $1
-			  ORDER BY id;`
+			  ORDER BY seniority DESC;`
+	//   ORDER BY id;` //To be validated
 
 	// executes SQL query
 	rows, err := db.QueryContext(ctx, query, id)

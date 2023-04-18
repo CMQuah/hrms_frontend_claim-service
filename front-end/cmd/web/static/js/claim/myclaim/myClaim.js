@@ -64,9 +64,21 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // when form is submitted (save button)
     document.querySelector('#claimFormSubmit').addEventListener('click', () => {
-        const error = Common.validateRequiredFields(myRIF)
+        let error = Common.validateRequiredFields(myRIF)
         myData = Common.getForm('claimForm', connectedID)
         console.log(myData);
+        let errsForm = Helpers.validateApplication(myData)
+        // iterate through errsForm's keys and check any with value with 1
+        // if any, display warning message
+  
+        for (const [key, value] of Object.entries(errsForm)) {
+            if (value == '1') {
+                console.log(key)
+                Common.showDivByID('warningMessageDiv')
+                error = 1
+            }
+        }
+
         if (error == '0') {
             API.createClaim(myData).then(resp => {
                 console.log(resp);

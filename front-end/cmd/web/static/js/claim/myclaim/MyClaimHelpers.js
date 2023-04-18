@@ -55,8 +55,7 @@ class MyClaimHelpers {
             opt.id = 'myclaimDefinition' + myID
             opt.value = myID
             opt.innerHTML = element.name
-            opt.dataset.confirmation = element.confirmation
-            opt.dataset.seniority = element.seniority
+            opt.dataset.details = JSON.stringify(element.details); //requires stringify else get object Object
             opt.dataset.docRequired = element.docRequired
             opt.dataset.limitation = element.limitation
             target.appendChild(opt)
@@ -119,10 +118,9 @@ class MyClaimHelpers {
     }
     // populate hidden field (form: confirmation | seniority | docRequired | limitation)
     populateHiddenFields(data) {
-        Common.insertInputValue(data.confirmation, 'confirmation')
-        Common.insertInputValue(data.seniority, 'seniority')
+        Common.insertInputValue(data.details, 'details')
         Common.insertInputValue(data.docRequired, 'docRequired')
-        Common.insertInputValue(data.limitation, 'limitation')
+
     }
 
     // convert birthdate (remove timestamp)
@@ -187,4 +185,48 @@ class MyClaimHelpers {
         const myBody = document.querySelector('#confirmDeleteBody')
         myBody.innerHTML = msg
     }
+    validateApplication(myData) {
+        connectedUser.joinDate = new Date(connectedUser.joinDate)
+        let details = document.querySelector('#details').value
+        // let docRequired = document.querySelector('#docRequired').value //TODO: Need help on this
+        let limitationToCheck
+        let detailObj = JSON.parse(details)
+        let myDataObj = JSON.parse(myData)
+        //iterate through the details array object and get the limitation and seniority
+        for (let i = 0; i < detailObj.length; i++) {
+            // get the seniority and check whether it's within the seniority or not
+            if (this.getYearDifference(connectedUser.joinDate) >= detailObj[i].seniority) {
+                limitationToCheck = detailObj[i].limitation
+                break //beware of gotcha where it only breaks inner loop.... Lookout if in the future it's a nested for loop 
+            }
+        }
+        let errAmount = myDataObj.amount>= limitationToCheck ? 1:0
+        return {'errAmount':errAmount, errDocRequired:0} //need help with doc uploaded
+
+    }
+
+    //Calculate the difference in months
+    getMonthDifference(date) {
+        var currentDate = new Date(Date.now());
+        var yearDiff = currentDate.getFullYear() - date.getFullYear();
+        var monthDiff = currentDate.getMonth() - date.getMonth();
+        var dayDiff = currentDate.getDate() - date.getDate();
+
+        // Check for cases where dayDiff may result in a negative value
+        if (dayDiff < 0) {
+            monthDiff--;
+        }
+
+        // Add the year difference to the month difference
+        monthDiff += yearDiff * 12;
+
+        return monthDiff;
+    }
+    //Calculate the difference in years
+    getYearDifference(date) {
+        var monthDiff = this.getMonthDifference(date);
+        var yearDiff = Math.floor(monthDiff / 12);
+        return yearDiff;
+    }
+
 }
