@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -10,8 +11,10 @@ import (
 func CreateMyClaim(w http.ResponseWriter, r *http.Request) {
 	// send post request to employee-service and collect the response
 	url := claimService + "api/v1/myclaim/create"
+	log.Println("DiD it enter here")
 	resp, err := http.Post(url, "application/json", r.Body)
 	if err != nil {
+		log.Println("check post at router", err)
 		errorJSON(w, err)
 		return
 	}

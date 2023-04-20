@@ -1,4 +1,5 @@
 const broker = 'http://localhost:8088/'
+const frontend = 'http://localhost:8484/'
 
 class MyClaimAPI {
 
@@ -101,5 +102,17 @@ class MyClaimAPI {
     const result = await response.json()
     return result
   }
+    // upload attachment
+    async uploadClaimAttachment(formData) {
+      const url = frontend + 'api/v1/claim/upload/'
+      const body = {
+        method: 'POST',
+        body: formData,
+      }
+  
+      const response = await fetch(url,body);
+      const result = await response.json();
+      return result;
+    }
 
 }

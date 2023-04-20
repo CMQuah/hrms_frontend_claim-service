@@ -14,7 +14,7 @@ func createMyDefaultValue() claimDefaultValue {
 		ApprovedAt:     "0001-01-01",
 		ApprovedBy:     0,
 		ApprovedAmount: 0,
-		ApprovedReason: "",
+		RejectedReason: "",
 		SoftDelete:     0,
 	}
 }
@@ -55,7 +55,7 @@ func (c *Claim) Insert() (int, error) {
 		cdv.ApprovedAt,
 		cdv.ApprovedBy,
 		cdv.ApprovedAmount,
-		cdv.ApprovedReason,
+		cdv.RejectedReason,
 		c.EmployeeID,
 		c.CreatedBy,
 		c.UpdatedBy,
@@ -159,7 +159,8 @@ func (c *Claim) GetAllMyClaim(eid int) ([]*Claim, error) {
 					 c.claim_definition_id,
 					 cd.name as claim_definition,
 					 c.description, 
-					 c.amount, 
+					 c.amount,
+					 ccc.name AS category,
 					 c.status_id, 
 					 ccs.name as status, 
 					 c.approved_at, 
@@ -170,10 +171,11 @@ func (c *Claim) GetAllMyClaim(eid int) ([]*Claim, error) {
 					 c.created_by,
 					 c.updated_at,
 					 c.updated_by
-			  FROM public."CLAIM_APPLICATION" c, public."CLAIM_DEFINITION" cd, public."CONFIG_STATUS" ccs
+			  FROM public."CLAIM_APPLICATION" c, public."CLAIM_DEFINITION" cd, public."CONFIG_STATUS" ccs, public."CONFIG_CATEGORY" ccc
 			  WHERE c.soft_delete = 0
 			  AND c.employee_id = $1
 			  AND c.claim_definition_id = cd.id
+			  AND cd.category_id = ccc.id
 			  and c.status_id = ccs.id
 			  ORDER BY c.id;`
 
@@ -195,12 +197,13 @@ func (c *Claim) GetAllMyClaim(eid int) ([]*Claim, error) {
 			&myClaims.ClaimDefinition,
 			&myClaims.Description,
 			&myClaims.Amount,
+			&myClaims.Category,
 			&myClaims.StatusID,
 			&myClaims.Status,
 			&myClaims.ApprovedAt,
 			&myClaims.ApprovedBy,
 			&myClaims.ApprovedAmount,
-			&myClaims.ApprovedReason,
+			&myClaims.RejectedReason,
 			&myClaims.CreatedAt,
 			&myClaims.CreatedBy,
 			&myClaims.UpdatedAt,
@@ -334,7 +337,7 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 					 cd.name as claim_definition,
 					 c.description, 
 					 c.amount, 
-					 ccc.name as category, 
+					 ccc.name as category,
 					 c.status_id, 
 					 ccs.name as status, 
 					 c.approved_at, 
@@ -348,6 +351,7 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 					 c.updated_by
 			  FROM public."CLAIM_APPLICATION" c, public."CLAIM_DEFINITION" cd, public."CONFIG_CATEGORY" ccc, public."CONFIG_STATUS" ccs
 			  WHERE c.status_id = $1
+			  AND cd.category_id = ccc.id
 			  AND c.claim_definition_id = cd.id
 			  and c.status_id = ccs.id
 			  ORDER BY c.id;`
@@ -369,12 +373,13 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 			&myClaims.ClaimDefinition,
 			&myClaims.Description,
 			&myClaims.Amount,
+			&myClaims.Category,
 			&myClaims.StatusID,
 			&myClaims.Status,
 			&myClaims.ApprovedAt,
 			&myClaims.ApprovedBy,
 			&myClaims.ApprovedAmount,
-			&myClaims.ApprovedReason,
+			&myClaims.RejectedReason,
 			&myClaims.EmployeeID,
 			&myClaims.CreatedAt,
 			&myClaims.CreatedBy,
@@ -446,7 +451,7 @@ func getAllMyClaimByStatus(status, eid int) ([]*Claim, error) {
 			&myClaims.ApprovedAt,
 			&myClaims.ApprovedBy,
 			&myClaims.ApprovedAmount,
-			&myClaims.ApprovedReason,
+			&myClaims.RejectedReason,
 			&myClaims.EmployeeID,
 			&myClaims.CreatedAt,
 			&myClaims.CreatedBy,

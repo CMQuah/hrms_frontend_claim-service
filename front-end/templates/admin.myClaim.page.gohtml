@@ -33,6 +33,7 @@
             <tr>
               <th>Allowance</th>
               <th>Description</th>
+              <th>Category</th> 
               <th>Amount</th>
               <th>Status</th>
               <th>Approved at</th>
@@ -115,20 +116,10 @@
               </div>          
             </div>          
           </div>
-          <!-- 2n row (category) -->
-          <div class="row mb-3">
-            <!-- Claim category -->
-            <div class="col-sm-4 hide" id="categoryDiv">
-              <div class="form-floating">
-                <select class="form-select" id="category" name="category" aria-label="Select one category"></select>
-                <label for="category"><i class="bi-shield-fill-exclamation"></i> Category</label>
-              </div>
-              <div class="fw-bolder text-danger fst-italic smaller" id="categoryError"></div>
-            </div>
           <!-- 3rd row upload documentation -->
           <div class="col-sm-4 hide" id="uploadDocDiv">                
             <div class="form-floating">
-              <input type="text" class="form-control" id="documentation" name="documentation" />
+              <input class="form-control" id="documentation" name="documentation" disabled />
               <label for="documentation">Upload documentation</label>
             </div>
             <!-- identity:  documentation files buttons (upload, uploaded, archived) -->
@@ -167,8 +158,9 @@
   </div>
 </div>
 <!--FORM UPLOAD FILES -->
-<!-- TODO add upload api http://localhost:8484/api/v1/claim/upload/ -->
-<form action=# id="uploadedFilesForm" name="uploadedFilesForm"  method="POST" enctype="multipart/form-data">
+
+<!-- <form action="http://localhost:8484/api/v1/claim/upload/" id="uploadedFilesForm" name="uploadedFilesForm"  method="POST" enctype="multipart/form-data"> -->
+<form id="uploadedFilesForm" name="uploadedFilesForm"  method="POST" enctype="multipart/form-data">
   <div class="modal fade" id="uploadedFilesModal" aria-labelledby="uploadedFilesLabel" aria-hidden="true"> 
     <div class="modal-dialog">
       <div class="modal-content">
@@ -189,7 +181,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
-          <input type="submit" class="btn btn-danger" value="Upload" />
+          <input type="button" class="btn btn-danger" value="Upload" id="claimDocumentSubmitBtn"/>
         </div>
       </div>
     </div>

@@ -60,19 +60,19 @@ class ClaimDefinitionHelpers {
             row.innerHTML = `<div class='existingDetailsRow row' id="${idOnly}">
                                         <div class="col-sm-4 existingDetails">
                                             <div class="form-floating">
-                                            <input type="text" class="form-control existingSeniority" id="${existingSeniorityID}" name="${existingSeniorityID}" value="${seniorityExist}"/>
+                                            <input type="text" class="form-control input-row existingSeniority" id="${existingSeniorityID}" name="${existingSeniorityID}" value="${seniorityExist}"/>
                                             <label for="seniority"><i class="bi-shield-fill-exclamation"></i> seniority</label>
                                             </div>
                                             <div class="fw-bolder text-danger fst-italic smaller existingSeniorityError" id="${existingSeniorityID}Error"></div>
                                         </div>
                                         <div class="col-sm-4 existingDetails">
                                             <div class="form-floating">
-                                            <input type="text" class="form-control existingLimitation" id="${existingLimitationID}" name="${existingLimitationID}" value="${data[4].childNodes[elem].innerText}" />
+                                            <input type="text" class="form-control input-row existingLimitation" id="${existingLimitationID}" name="${existingLimitationID}" value="${data[4].childNodes[elem].innerText}" />
                                             <label for="limitation"><i class="bi-shield-fill-exclamation"></i> limitation</label>
                                             </div>
                                             <div class="fw-bolder text-danger fst-italic smaller existingLimitationError" id="${existingLimitationID}Error"></div>
                                         </div> 
-                                        <div class="col-sm-4 existingDetails"><input type="checkbox" class="toggle-checkbox" /><label>Mark For Delete</label></div>
+                                        <div class="col-sm-4 existingDetails"><input type="checkbox" class="toggle-checkbox" /><label>Mark For Delete</label><i class="bi-trash2-fill largeIcon pointer"</div>
                             </div>`
             target.appendChild(row)
 
@@ -123,7 +123,7 @@ class ClaimDefinitionHelpers {
         let row = document.createElement('div')
         
         row.id = 'newDetails' + n
-        row.classList = 'row mb-3 newRowDetails'
+        row.classList = 'row mb-3 newRowDetails detailRemovable'
         row.innerHTML = `<div class="col-sm-4 row detailRemovable">
                                 <div class="form-floating">
                                 <input type="text" class="form-control input-row newSeniority" id="seniority${n}" name="seniority${n}" />

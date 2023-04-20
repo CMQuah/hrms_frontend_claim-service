@@ -43,12 +43,13 @@ type Claim struct {
 	Description       string  `json:"description"`
 	Amount            float32 `json:"amount,string,omitempty"`
 	CategoryID        int     `json:"categoryid,string,omitempty"`
+	Category          string  `json:"category"`
 	StatusID          int     `json:"statusid,string,omitempty"`
 	Status            string  `json:"status"`
 	ApprovedAt        string  `json:"approvedAt"`
 	ApprovedBy        int     `json:"approvedBy,string,omitempty"`
 	ApprovedAmount    float32 `json:"approvedAmount,string,omitempty"`
-	ApprovedReason    string  `json:"approvedReason"`
+	RejectedReason    string  `json:"rejectedReason"`
 	EmployeeID        int     `json:"employeeid,string,omitempty"`
 	SoftDelete        int     `json:"softDelete,string,omitempty"`
 	CreatedAt         string  `json:"createdAt,omitempty"`
@@ -64,7 +65,7 @@ type claimDefaultValue struct {
 	ApprovedAt     string
 	ApprovedBy     int
 	ApprovedAmount float32
-	ApprovedReason string
+	RejectedReason string
 	SoftDelete     int
 }
 
@@ -98,8 +99,8 @@ type ClaimDefinition struct {
 // Structure holding one Claim Definition detail
 type ClaimDefinitionDetails struct {
 	ID                int     `json:"rowid,string,omitempty"`
-	Seniority         int     `json:"seniority,string"`            // TODO: discuss with Ben maybe send as integer... Reason no need to parseInt on js ?
-	Limitation        float32 `json:"limitation,string,omitempty"` // TODO: discuss with Ben whether to remove omit empty here.... and maybe send as float ?
+	Seniority         int     `json:"seniority,string"`
+	Limitation        float32 `json:"limitation,string,omitempty"`
 	ClaimDefinitionID int     `json:"claimDefinitionID,string,omitempty"`
 	SoftDelete        int     `json:"softDelete,string,omitempty"`
 	CreatedAt         string  `json:"createdAt,omitempty"`

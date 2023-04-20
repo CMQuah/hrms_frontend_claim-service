@@ -33,10 +33,10 @@ window.addEventListener('DOMContentLoaded', () => {
         })
     })
 
-    // fetch all claim's config table & update DOM (form)
-    API.getClaimCT().then(resp => {
-        Helpers.insertOptions('category', resp.data.Category)
-    })
+    // // fetch all claim's config table & update DOM (form)
+    // API.getClaimCT().then(resp => {
+    //     Helpers.insertOptions('category', resp.data.Category)
+    // })
 
     // fetch all claim's definitions & update DOM (form)
     API.getAllClaimDefinition().then(resp => {
@@ -48,9 +48,7 @@ window.addEventListener('DOMContentLoaded', () => {
             // populate hidden fields (for form validation: confirmation | seniority | docRequired | limitation)
             const myCDValidation = document.querySelector('#myclaimDefinition' + claimDefinitionID).dataset
             Helpers.populateHiddenFields(myCDValidation)
-            // if 'not defined' is selected 
-            // display category & name (or hide)
-            // make category & name required (or not)
+            // switch form fields view
             Helpers.switchFormFieldsView()
         })
     })
@@ -139,7 +137,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const uploadModal = new bootstrap.Modal(document.getElementById('uploadedFilesModal'), {
         keyboard: false
     })
-    // when upload ic button is clicked
+    // when upload documentation button is clicked
     const myICBtn = document.querySelector('#uploadDocumentationButton')
     myICBtn.addEventListener('click', () => {
         const wanted = 'docs'
@@ -147,4 +145,28 @@ window.addEventListener('DOMContentLoaded', () => {
         uploadModal.toggle()
     })
 
+    // when upload button in modal is clicked
+    const uploadBtn = document.querySelector('#claimDocumentSubmitBtn')
+    uploadBtn.addEventListener('click', () => {
+        let fileInput = document.getElementById("uploadedFiles");
+        let files = fileInput.files;
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            formData.append("attachments[]", file);
+        }
+        formData.append("uploadedFilename", document.getElementById("uploadedFilename").value)
+        formData.append("employeeEmail", document.getElementById("employeeEmail").value)
+        formData.append("employeeID", document.getElementById("employeeID").value)
+     
+        API.uploadClaimAttachment(formData).then(resp => {  
+            if (!resp.error) {
+                document.getElementById("documentation").value = files.length + ' file(s) uploaded' 
+                uploadModal.toggle()
+                console.log(resp.data)
+            }
+        })
+    })
+
+        
 })

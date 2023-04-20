@@ -53,6 +53,8 @@ func multiplexer() http.Handler {
 	// API with middleware (upload)
 	mux.Handle("/api/v1/employee/upload/", handlers.Middleware(http.HandlerFunc(handlers.Repo.UploadFiles)))
 	mux.Handle("/api/v1/employee/getUploadedFiles/", handlers.Middleware(http.HandlerFunc(handlers.Repo.GetUploadedFiles)))
+	mux.Handle("/api/v1/claim/upload/", handlers.Middleware(http.HandlerFunc(handlers.Repo.UploadFilesClaim)))
+	mux.Handle("/api/v1/claim/move/", handlers.Middleware(http.HandlerFunc(handlers.Repo.MoveFilesClaim)))
 
 	return mux
 }

@@ -91,7 +91,7 @@ class HomeHelpers{
                                 <div class="col">${element.status}</div>
                                 <div class="col">${element.amount}</div>
                                 <div class="col">${this.convertUndefined(element.approvedAmount)}</div>
-                                <div class="col-3">${element.approvedReason}</div>
+                                <div class="col-3">${element.rejectedReason}</div>
                                 <div class="col">${this.formatDate(element.createdAt)}</div>`
 
                 targetRequested.appendChild(row)
@@ -107,7 +107,7 @@ class HomeHelpers{
                                 <div class="col">${element.status}</div>
                                 <div class="col">${element.amount}</div>
                                 <div class="col">${this.convertUndefined(element.approvedAmount)}</div>
-                                <div class="col-3">${element.approvedReason}</div>
+                                <div class="col-3">${element.rejectedReason}</div>
                                 <div class="col">${this.formatDate(element.createdAt)}</div>`
 
                 targetRequested.appendChild(row)

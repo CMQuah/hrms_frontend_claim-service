@@ -95,8 +95,8 @@ class MyClaimHelpers {
     populateUploadFiles(wanted) {
         switch (wanted) {
             case 'docs':
-                Common.insertHTML('Documentation', 'uploadedFilesTitle')
-                Common.insertInputValue('Documentation', 'uploadedFilename')
+                Common.insertHTML('claim', 'uploadedFilesTitle')
+                Common.insertInputValue('claims', 'uploadedFilename')
                 break;
             default:
                 break;
@@ -130,10 +130,12 @@ class MyClaimHelpers {
             Common.hideDivByID('uploadDocDiv')
         }
     }
-    // populate hidden field (form: confirmation | seniority | docRequired | limitation)
-    populateHiddenFields(data) {
+    // populate hidden field (form: employeeEmail | employeeID | docRequired | limitation)
+    populateHiddenFields(data, eid) {
         Common.insertInputValue(data.details, 'details')
         Common.insertInputValue(data.docRequired, 'docRequired')
+        Common.insertInputValue(connectedID, 'employeeID') 
+        Common.insertInputValue(connectedEmail, 'employeeEmail')
 
     }
 
@@ -154,12 +156,13 @@ class MyClaimHelpers {
             opt.id = 'myClaim' + element.rowid
             opt.innerHTML = `<td class="row-data" data-id="${element.claimDefinitionID}">${element.claimDefinition}</td>
                              <td class="row-data">${element.description}</td>
+                             <td class="row-data">${element.category}</td>
                              <td class="row-data">${element.amount}</td>
                              <td class="row-data" data-id="${element.statusID}">${element.status}</td>
                              <td class="row-data">${this.formatDate(element.approvedAt)}</td>
                              <td class="row-data">${allEmployees.get(Number(element.approvedBy))}</td>
                              <td class="row-data">${element.approvedAmount}</td>
-                             <td class="row-data">${element.approvedReason}</td>
+                             <td class="row-data">${element.rejectedReason}</td>
                              <td>
                                 <div class="d-flex justify-content-center">
                                     <div class="form-check">

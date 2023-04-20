@@ -275,7 +275,7 @@
   top: 42%;
 }
 
-/* CSS to change the input box to grey when disabled */
+/* CSS to change the input box to grey when disabled */ 
 .disabled input[type="text"] {
   pointer-events: none;
     opacity: 0.5;
