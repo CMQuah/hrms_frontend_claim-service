@@ -114,5 +114,15 @@ class MyClaimAPI {
       const result = await response.json();
       return result;
     }
-
+    //move to the right folder
+    async moveClaimAttachment(formData, applicationId) {
+      const url = frontend + 'api/v1/claim/move/'+applicationId.toString()  
+      const body = {
+        method: 'POST',
+        body: formData,
+      }
+      const response = await fetch(url,body);
+      const result = await response.json();
+      return result;
+    }
 }

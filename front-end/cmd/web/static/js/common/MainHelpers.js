@@ -164,4 +164,13 @@ class MainHelpers{
 
         return allEmployees
     }
+    //return true if Alphanumeric
+    isAlphanumeric(value) {
+        return /^[a-zA-Z0-9]+$/.test(value);
+    }
+
+    // return true if contain special characters
+    hasSpecialCharacters(value) {
+        return /[^a-zA-Z0-9]/.test(value);
+    }    
 }

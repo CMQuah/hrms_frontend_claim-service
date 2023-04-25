@@ -1,9 +1,9 @@
 class MyClaimHelpers {
 
-    populateWarningMessage(notValid){
+    populateWarningMessage(notValid) {
         let msg
-        (notValid.length == 1) ? msg = `Sorry there is an error with this field <ul>` : 
-                                 msg = `Sorry there is still few errors with those fields <ul>`
+        (notValid.length == 1) ? msg = `Sorry there is an error with this field <ul>` :
+            msg = `Sorry there is still few errors with those fields <ul>`
 
         notValid.forEach(field => {
             msg += `<li>${Common.replaceCamelCase(field)}</li>`
@@ -15,17 +15,17 @@ class MyClaimHelpers {
     }
 
     // display main warning message
-    displayWarningMessage(notValid){
-        const myWarningDivID  = 'warningMessageDiv',
-              myWarningBodyID = 'warningMessageBody'
+    displayWarningMessage(notValid) {
+        const myWarningDivID = 'warningMessageDiv',
+            myWarningBodyID = 'warningMessageBody'
 
         if (!notValid?.length) {
             Common.hideDivByID(myWarningDivID)
-        }else{
+        } else {
             Common.showDivByID(myWarningDivID)
             Common.insertHTML(this.populateWarningMessage(notValid), myWarningBodyID)
         }
-      
+
     }
 
     // populate form to edit entry
@@ -134,7 +134,7 @@ class MyClaimHelpers {
     populateHiddenFields(data, eid) {
         Common.insertInputValue(data.details, 'details')
         Common.insertInputValue(data.docRequired, 'docRequired')
-        Common.insertInputValue(connectedID, 'employeeID') 
+        Common.insertInputValue(connectedID, 'employeeID')
         Common.insertInputValue(connectedEmail, 'employeeEmail')
 
     }
@@ -203,10 +203,18 @@ class MyClaimHelpers {
     validateApplication(myData) {
         connectedUser.joinDate = new Date(connectedUser.joinDate)
         let details = document.querySelector('#details').value
+        this.removeElementFromRIF('documentation')
         // let docRequired = document.querySelector('#docRequired').value //TODO: Need help on this
         let limitationToCheck
+        let errDocRequired
         let detailObj = JSON.parse(details)
         let myDataObj = JSON.parse(myData)
+        //Oddly when disabled can't get form value therefore....
+        if (document.querySelector('#docRequired').value === '1') {
+            //Oddly when disabled can't get form value therefore...
+            errDocRequired = document.querySelector('#documentation').value == '' ? 1 : 0
+            myRIF.push('documentation')
+        }
         //iterate through the details array object and get the limitation and seniority
         for (let i = 0; i < detailObj.length; i++) {
             // get the seniority and check whether it's within the seniority or not
@@ -215,8 +223,10 @@ class MyClaimHelpers {
                 break //beware of gotcha where it only breaks inner loop.... Lookout if in the future it's a nested for loop 
             }
         }
-        let errAmount = myDataObj.amount> limitationToCheck ? 1:0
-        return {'errAmount':errAmount, errDocRequired:0} //need help with doc uploaded
+
+        // validate input is valid or not and within limitation
+        let errAmount = (!this.validateAmountInRM(myDataObj.amount) && myDataObj.amount > limitationToCheck) ? 1 : 0
+        return { 'errAmount': errAmount, 'errDocRequired': errDocRequired } //need help with doc uploaded
 
     }
 
@@ -242,6 +252,11 @@ class MyClaimHelpers {
         var monthDiff = this.getMonthDifference(date);
         var yearDiff = Math.floor(monthDiff / 12);
         return yearDiff;
+    }
+
+    //Check whether it's a valid amount in (RM) allow user to input with sen or '.'
+    validateAmountInRM(value) {
+        return /^[0-9]+(?:\.[0-9]{1,2})?$/.test(value);
     }
 
 }

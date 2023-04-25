@@ -58,21 +58,24 @@ class ClaimDefinitionHelpers {
             let idOnly = this.extractIDfromRowID(existingLimitationID)
             let seniorityExist = data[3].childNodes[elem].innerText.replace('From year ', '')
             row.innerHTML = `<div class='existingDetailsRow row' id="${idOnly}">
-                                        <div class="col-sm-4 existingDetails">
-                                            <div class="form-floating">
-                                            <input type="text" class="form-control input-row existingSeniority" id="${existingSeniorityID}" name="${existingSeniorityID}" value="${seniorityExist}"/>
+                                <div class="col-sm-4 existingDetails">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control input-row existingSeniority" id="${existingSeniorityID}" name="${existingSeniorityID}" value="${seniorityExist}"/>
                                             <label for="seniority"><i class="bi-shield-fill-exclamation"></i> seniority</label>
-                                            </div>
-                                            <div class="fw-bolder text-danger fst-italic smaller existingSeniorityError" id="${existingSeniorityID}Error"></div>
-                                        </div>
-                                        <div class="col-sm-4 existingDetails">
-                                            <div class="form-floating">
-                                            <input type="text" class="form-control input-row existingLimitation" id="${existingLimitationID}" name="${existingLimitationID}" value="${data[4].childNodes[elem].innerText}" />
+                                    </div>
+                                    <div class="fw-bolder text-danger fst-italic smaller existingSeniorityError" id="${existingSeniorityID}Error">
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 existingDetails">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control input-row existingLimitation" id="${existingLimitationID}" name="${existingLimitationID}" value="${data[4].childNodes[elem].innerText}" />
                                             <label for="limitation"><i class="bi-shield-fill-exclamation"></i> limitation</label>
-                                            </div>
-                                            <div class="fw-bolder text-danger fst-italic smaller existingLimitationError" id="${existingLimitationID}Error"></div>
-                                        </div> 
-                                        <div class="col-sm-4 existingDetails"><input type="checkbox" class="toggle-checkbox" /><label>Mark For Delete</label><i class="bi-trash2-fill largeIcon pointer"</div>
+                                    </div>
+                                    <div class="fw-bolder text-danger fst-italic smaller existingLimitationError" id="${existingLimitationID}Error">
+                                    </div>
+                                </div> 
+                                <div class="col-sm-4 existingDetails"><input type="checkbox" class="toggle-checkbox" /><label>Mark For Delete</label><i class="bi-trash2-fill largeIcon pointer"></i>
+                                </div>
                             </div>`
             target.appendChild(row)
 
@@ -90,7 +93,7 @@ class ClaimDefinitionHelpers {
         let row = document.createElement('div')
         row.classList = 'row mb-3 detailRemovable'
         row.innerHTML =`<!-- Claim definition details Seniority -->
-                            <div class="col-sm-4">
+                        <div class="col-sm-4">
                             <div class="form-floating">
                                 <input type="text" class="form-control" id="seniority0" name="seniority0" value="0" />
                                 <label for="seniority"><i class="bi-shield-fill-exclamation"></i> Seniority</label>
@@ -105,7 +108,7 @@ class ClaimDefinitionHelpers {
                             </div>
                             <div class="fw-bolder text-danger fst-italic smaller" id="limitation0Error"></div>
                             </div>
-                            <div class="col-sm-4"></div>
+                        <div class="col-sm-4"></div>
                         `
         target.appendChild(row)
         myRIF.push('limitation0')
@@ -124,21 +127,30 @@ class ClaimDefinitionHelpers {
         
         row.id = 'newDetails' + n
         row.classList = 'row mb-3 newRowDetails detailRemovable'
-        row.innerHTML = `<div class="col-sm-4 row detailRemovable">
+        row.innerHTML = `<div class='newDetailsRow row'>
+                            <div class="col-sm-4 detailRemovable">
                                 <div class="form-floating">
-                                <input type="text" class="form-control input-row newSeniority" id="seniority${n}" name="seniority${n}" />
-                                <label for="seniority"><i class="bi-shield-fill-exclamation"></i> seniority</label>
+                                    <input type="text" class="form-control input-row newSeniority" id="seniority${n}" 
+                                        name="seniority${n}" />
+                                    <label for="seniority"><i class="bi-shield-fill-exclamation"></i> seniority</label>
                                 </div>
-                                <div class="fw-bolder text-danger fst-italic smaller newSeniorityError" id="seniority${n}Error"></div>
+                                <div class="fw-bolder text-danger fst-italic smaller newSeniorityError" id="seniority${n}Error">
+                                </div>
                             </div>
                             <div class="col-sm-4 detailRemovable">
                                 <div class="form-floating">
-                                <input type="text" class="form-control input-row newLimitation" id="limitation${n}" name="limitation${n}" />
-                                <label for="limitation"><i class="bi-shield-fill-exclamation"></i> limitation</label>
+                                    <input type="text" class="form-control input-row newLimitation" id="limitation${n}"
+                                        name="limitation${n}" />
+                                    <label for="limitation"><i class="bi-shield-fill-exclamation"></i> limitation</label>
                                 </div>
-                                <div class="fw-bolder text-danger fst-italic smaller newLimitationError" id="limitation${n}Error"></div>
-                            </div> 
-                            <div class="col-sm-4 detailRemovable"><i class="bi-trash2-fill largeIcon pointer deleteDetailRowsButton" data-id="${n}" id="deleteDetailsRow${n}"></i></div>`
+                                <div class="fw-bolder text-danger fst-italic smaller newLimitationError" id="limitation${n}Error">
+                                </div>
+                            </div>
+                            <div class="col-sm-4 detailRemovable">
+                                <i class="bi-trash2-fill largeIcon pointer deleteDetailRowsButton" data-id="${n}" id="deleteDetailsRow${n}">
+                                </i>
+                            </div>
+                        </div>`
         target.appendChild(row)
 
         // set new elements as required

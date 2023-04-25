@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 // API which upload to file server all posted files for one employee
@@ -91,6 +92,7 @@ func (rep *Repository) MoveFilesClaim(w http.ResponseWriter, r *http.Request) {
 
 		//get URL and last part of URL // filePath base as quick hack
 		claimAppId := filepath.Base(r.URL.String())
+		log.Println("claimAppId is : ", claimAppId)
 
 		// Get fullPath with claimAppId and create the dir
 		fullpath := filepath.Join(path, a.Email, a.Filename, claimAppId)
@@ -125,16 +127,19 @@ func (rep *Repository) MoveFilesClaim(w http.ResponseWriter, r *http.Request) {
 
 // extract form data from payload
 func extractClaimAttachmentsInfo(r *http.Request) (*attachments, error) {
-	// Parse our multipart form, 10 << 20 specifies a maximum upload of 10 MB files.
-	err := r.ParseMultipartForm(10 << 20)
-	if err != nil {
-		return nil, err
+	var files []*multipart.FileHeader
+	// check if request is multipart if not it's for moving files to the right dir
+	if strings.Contains(r.Header.Get("Content-Type"), "multipart/form-data") {
+		// Parse our multipart form, 10 << 20 specifies a maximum upload of 10 MB files.
+		err := r.ParseMultipartForm(10 << 20)
+		if err != nil {
+			return nil, err
+		}
+		// read the Form data
+		formdata := r.MultipartForm
+		files = formdata.File["attachments[]"]
 	}
-	// read the Form data
-	formdata := r.MultipartForm
 
-	// collect form information:
-	files := formdata.File["attachments[]"]
 	filename := r.FormValue("uploadedFilename")
 	email := r.FormValue("employeeEmail")
 	ID := r.FormValue("employeeID")
