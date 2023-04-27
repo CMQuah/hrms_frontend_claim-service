@@ -1,5 +1,5 @@
 const broker = 'http://localhost:8088/'
-const fileServer = 'http://localhost:8484/'
+const fileServer = 'http://localhost/'
 
 class ClaimAPI {
 

@@ -1,5 +1,5 @@
 const broker = 'http://localhost:8088/'
-const frontend = 'http://localhost:8484/'
+const frontend = 'http://localhost/'
 
 class MyClaimAPI {
 

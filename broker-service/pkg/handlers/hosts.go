@@ -2,7 +2,7 @@ package handlers
 
 // http service
 const (
-	frontEnd        = "http://localhost:8484/"
+	frontEnd        = "http://localhost/"
 	authService     = "http://authentication-service:8081/"
 	leaveService    = "http://leave-service:8881/"
 	employeeService = "http://employee-service:8882/"
