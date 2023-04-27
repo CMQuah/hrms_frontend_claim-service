@@ -63,41 +63,42 @@ window.addEventListener('DOMContentLoaded', () => {
     // when form is submitted (save button)
     document.querySelector('#claimFormSubmit').addEventListener('click', () => {
         let error = Common.validateRequiredFields(myRIF)
-        myData = Common.getForm('claimForm', connectedID)
-        console.log(myData);
-        let errorsKeys = []
-        let errsForm = Helpers.validateApplication(myData)
-        // iterate through errsForm's keys and check any with value with 1
-        // if any, display warning message
+        let myData = Common.getForm('claimForm', connectedID)
+        API.getEmployeeClaimByID(connectedID).then(resp => {
+            let errorsKeys = []
+            let errsForm = Helpers.validateApplication(myData, resp.data)
+            // iterate through errsForm's keys and check any with value with 1
+            // if any, display warning message
 
-        for (const [key, value] of Object.entries(errsForm)) {
-            if (key == 'errAmount' && value == '1') {
-                Common.insertHTML('Amount exceeded limitation', 'amountError')
-                error = 1
-                errorsKeys.push('amountError')
-            }
-            if (key == 'errDocRequired' && value == '1') {
-                Common.insertHTML('Claim requires documentation', 'documentationError')
-                error = 1
-                errorsKeys.push('documentationRequired')
-            }
-            Helpers.displayWarningMessage(errorsKeys);
-        }
-
-        if (error == '0') {
-            API.createClaim(myData).then(resp => {
-                console.log(resp);
-                let formData = new FormData();
-                formData.append("uploadedFilename", document.getElementById("uploadedFilename").value)
-                formData.append("employeeEmail", document.getElementById("employeeEmail").value)
-                formData.append("employeeID", document.getElementById("employeeID").value)
-                if (!resp.error) {
-                    API.moveClaimAttachment(formData, resp.data).then(resp => {
-                        location.reload()
-                    })
+            for (const [key, value] of Object.entries(errsForm)) {
+                if (key == 'errAmount' && value == '1') {
+                    Common.insertHTML('Amount exceeded limitation', 'amountError')
+                    error = 1
+                    errorsKeys.push('amountError')
                 }
-            })
-        }
+                if (key == 'errDocRequired' && value == '1') {
+                    Common.insertHTML('Claim requires documentation', 'documentationError')
+                    error = 1
+                    errorsKeys.push('documentationRequired')
+                }
+                Helpers.displayWarningMessage(errorsKeys);
+            }
+
+            if (error == '0') {
+                API.createClaim(myData).then(resp => {
+                    console.log(resp);
+                    let formData2 = new FormData();
+                    formData2.append("uploadedFilename", document.getElementById("uploadedFilename").value)
+                    formData2.append("employeeEmail", document.getElementById("employeeEmail").value)
+                    formData2.append("employeeID", document.getElementById("employeeID").value)
+                    if (!resp.error) {
+                        API.moveClaimAttachment(formData2, resp.data).then(resp => {
+                            location.reload()
+                        })
+                    }
+                })
+            }
+        })
     })
     // close warning message
     const myWarningMessage = document.querySelector('#hideWarningMessage')

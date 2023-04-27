@@ -17,11 +17,9 @@ import (
 func (rep *Repository) UploadFilesClaim(w http.ResponseWriter, r *http.Request) {
 	// Get my context from middleware request
 
-	log.Println("I am here before", r)
 	myc := r.Context().Value(httpContext).(httpContextStruct)
 
 	if myc.Auth {
-		log.Println("I am here")
 		// collect information from payload
 		a, err := extractClaimAttachmentsInfo(r)
 		if err != nil {
@@ -38,24 +36,6 @@ func (rep *Repository) UploadFilesClaim(w http.ResponseWriter, r *http.Request) 
 			log.Println("error", err)
 			rep.errorJSON(w, err)
 			return
-		}
-
-		// check if directory already got uploaded files
-		empty, err := isEmpty(fullpath)
-		if err != nil {
-			log.Println("error", err)
-			rep.errorJSON(w, err)
-			return
-		}
-
-		// archive files when directory is not empty
-		if !empty {
-			err = archiveClaimFiles(a.Email, a.Filename)
-			if err != nil {
-				log.Println("error", err)
-				rep.errorJSON(w, err)
-				return
-			}
 		}
 
 		// upload files to directory
@@ -103,17 +83,45 @@ func (rep *Repository) MoveFilesClaim(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//remove claimAppId from fullPath
-		docPath := filepath.Join(path, a.Email, a.Filename)
-		//get all files starting with bmp, jpg, png, pdf using glob
-		files, err := filepath.Glob(docPath + "/*.{bmp,jpg,png,pdf}")
+		//remove claimAppId from fullPath // TODO check whether i need this or not or just issue with glob
+		rPath, err := os.Getwd()
+		log.Println("rPath: ", rPath)
+		if err != nil {
+			log.Println("Error while getting working dir: ", err)
+			rep.errorJSON(w, err)
+			return
+		}
+		docPath := filepath.Join(rPath, path, a.Email, a.Filename)
+		log.Println("docPath: ", docPath)
+
+		// check if directory already got uploaded files
+		empty, err := isEmpty(fullpath)
+		if err != nil {
+			log.Println("error", err)
+			rep.errorJSON(w, err)
+			return
+		}
+
+		// archive files when directory is not empty
+		if !empty {
+			err = archiveClaimFiles(a.Email, a.Filename, claimAppId)
+			if err != nil {
+				log.Println("error", err)
+				rep.errorJSON(w, err)
+				return
+			}
+		}
+
+		files, err := globClaimFiles(docPath)
 		if err != nil {
 			log.Println("Error while getting files from dir: ", err)
 			rep.errorJSON(w, err)
 			return
 		}
+
 		// move all files to fullpath
 		for _, file := range files {
+			log.Println("File location, ", file, "move to path: ", fullpath+"/"+filepath.Base(file))
 			err = os.Rename(file, fullpath+"/"+filepath.Base(file))
 			if err != nil {
 				log.Println("Error while moving files: ", err)
@@ -121,8 +129,34 @@ func (rep *Repository) MoveFilesClaim(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+		var resp = jsonResponse{
+			Error:   false,
+			Message: "Attachment moved",
+		}
+
+		//response to be send back
+		rep.writeJSON(w, http.StatusAccepted, resp)
 
 	}
+}
+
+// Get all files.... go's glob behaviour is different from perl's glob "{.pdf, .jpg} not working as expected in golang"
+// Glob all claim files in accepted file extention formats and return them in a slice of strings in "fullpath" **provided if filePath is abspath
+func globClaimFiles(filePath string) ([]string, error) {
+
+	// Modifying this will do if there's a need to support more file extensions
+	supportedFileExt := []string{"pdf", "jpg", "png", "gif", "bmp"}
+
+	files := []string{}
+	for _, ext := range supportedFileExt {
+		globFiles, err := filepath.Glob(filePath + "/*." + ext)
+		if err != nil {
+			log.Println("Error while getting files from dir: ", err)
+			return nil, err
+		}
+		files = append(files, globFiles...)
+	}
+	return files, nil
 }
 
 // extract form data from payload
@@ -158,17 +192,17 @@ func extractClaimAttachmentsInfo(r *http.Request) (*attachments, error) {
 }
 
 // archive files
-func archiveClaimFiles(email, filename string) error {
+func archiveClaimFiles(email, filename string, claimId string) error {
 	// create archive folder (upload/email/archive/category/timestamp)
 	now := myTimestamp()
-	archive := filepath.Join(path, email, "archive", filename, now)
+	archive := filepath.Join(path, email, "archive", filename, claimId, now)
 	err := createNewFolder(archive)
 	if err != nil {
 		return err
 	}
 
 	// select all files from actual directory
-	actual := filepath.Join(path, email, filename)
+	actual := filepath.Join(path, email, filename, claimId)
 	entries, err := os.ReadDir(actual)
 	if err != nil {
 		return err

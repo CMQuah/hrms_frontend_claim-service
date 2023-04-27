@@ -1,4 +1,5 @@
 const broker = 'http://localhost:8088/'
+const fileServer = 'http://localhost:8484/'
 
 class ClaimAPI {
 
@@ -64,4 +65,12 @@ class ClaimAPI {
     const result = await response.json()
     return result
   }
+
+    // fetch all employee's uploaded files
+    async getUploadedClaimFiles(emailAndClaimId){
+      const url = fileServer + 'api/v1/claim/getUploadedFiles/' + emailAndClaimId
+      const response = await fetch(url)
+      const result = await response.json()
+      return result
+    }
 }

@@ -335,6 +335,7 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 	query := `SELECT c.id, 
 					 c.claim_definition_id,
 					 cd.name as claim_definition,
+					 cd.doc_required,
 					 c.description, 
 					 c.amount, 
 					 ccc.name as category,
@@ -351,6 +352,7 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 					 c.updated_by
 			  FROM public."CLAIM_APPLICATION" c, public."CLAIM_DEFINITION" cd, public."CONFIG_CATEGORY" ccc, public."CONFIG_STATUS" ccs
 			  WHERE c.status_id = $1
+			  AND c.soft_delete = 0
 			  AND cd.category_id = ccc.id
 			  AND c.claim_definition_id = cd.id
 			  and c.status_id = ccs.id
@@ -371,6 +373,7 @@ func getAllClaimByStatus(status int) ([]*Claim, error) {
 			&myClaims.ID,
 			&myClaims.ClaimDefinitionID,
 			&myClaims.ClaimDefinition,
+			&myClaims.ClaimDefinitionDocRequired,
 			&myClaims.Description,
 			&myClaims.Amount,
 			&myClaims.Category,

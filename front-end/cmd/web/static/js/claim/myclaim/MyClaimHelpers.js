@@ -200,7 +200,7 @@ class MyClaimHelpers {
         const myBody = document.querySelector('#confirmDeleteBody')
         myBody.innerHTML = msg
     }
-    validateApplication(myData) {
+    validateApplication(myData, previousClaim) {
         connectedUser.joinDate = new Date(connectedUser.joinDate)
         let details = document.querySelector('#details').value
         this.removeElementFromRIF('documentation')
@@ -209,7 +209,8 @@ class MyClaimHelpers {
         let errDocRequired
         let detailObj = JSON.parse(details)
         let myDataObj = JSON.parse(myData)
-        //Oddly when disabled can't get form value therefore....
+        let previousClaimAmount= previousClaim.Approved + previousClaim.Pending // add with pending so admin won't approved more than the limit
+        //Oddly when disabled can't get form value therefore....1
         if (document.querySelector('#docRequired').value === '1') {
             //Oddly when disabled can't get form value therefore...
             errDocRequired = document.querySelector('#documentation').value == '' ? 1 : 0
@@ -225,7 +226,7 @@ class MyClaimHelpers {
         }
 
         // validate input is valid or not and within limitation
-        let errAmount = (!this.validateAmountInRM(myDataObj.amount) && myDataObj.amount > limitationToCheck) ? 1 : 0
+        let errAmount = (!this.validateAmountInRM(myDataObj.amount) && (myDataObj.amount + previousClaimAmount) > limitationToCheck) ? 1 : 0
         return { 'errAmount': errAmount, 'errDocRequired': errDocRequired } //need help with doc uploaded
 
     }

@@ -125,4 +125,23 @@ class MyClaimAPI {
       const result = await response.json();
       return result;
     }
+
+    
+      // fetch connected employee's claims information (total)
+      async getEmployeeClaimByID(eid) {
+        const url = broker + 'route/myclaim/get/thisYear'
+
+        const payload = {
+            id: eid
+        }
+
+        const body = {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        }
+
+        const response = await fetch(url, body)
+        const result = await response.json()
+        return result
+    }
 }

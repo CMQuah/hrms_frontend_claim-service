@@ -51,6 +51,7 @@
               <th>Approved at</th>
               <th>Approved by</th>
               <th>Approved amount</th>
+              <th>Claim Attachments</th>
               <th>Reason</th>
               <th></th>
             </tr>
@@ -117,6 +118,21 @@
   </div>
 </div>
 
+<!-- MODAL UPLOADED CLAIM DOC FILES -->
+<div class="modal fade" id="uploadedClaimAttachment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="uploadedClaimAttachmentLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadedClaimAttachmentLabel">Uploaded Attachment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="uploadedClaimAttachmentBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 {{end}}
 
 {{define "js"}}

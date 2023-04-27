@@ -14,7 +14,7 @@ func (rep *Repository) GetUploadedFiles(w http.ResponseWriter, r *http.Request) 
 
 	if myc.Auth {
 		// get employee email from url
-		email := strings.TrimPrefix(r.URL.Path, "/api/v1/employee/getUploadedFiles/")
+		email := strings.TrimPrefix(r.URL.Path, "/api/v1/claim/getUploadedFiles/")
 
 		// get all employee's uploaded files
 		myFiles, err := myUploadedFiles(email)
